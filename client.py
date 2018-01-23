@@ -10,6 +10,7 @@ tcpCliSock = socket(AF_INET, SOCK_STREAM)
 tcpCliSock.connect(ADDR)
 
 data = raw_input('>')
+print 'shutdown'
 tcpCliSock.send(data)
 
 tcpCliSock.shutdown(SHUT_WR)
@@ -23,7 +24,7 @@ while True:
         data += recv_data
     except Exception as e:
         print e
-        break;
+        break
 
 
 print data

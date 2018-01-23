@@ -20,6 +20,7 @@ while True:
     data = ""
     while True:
         recv_data = tcpCliSock.recv(BUFSIZ)
+        print recv_data
         if not recv_data:
             break
         data += recv_data

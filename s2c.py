@@ -1,25 +1,28 @@
 from os import listdir
-from numpy import array
-from keras.preprocessing.text import Tokenizer, one_hot
+from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
-from keras.models import Model, Sequential, model_from_json
+from keras.models import Model, Sequential
 from keras.utils import to_categorical
 from keras.layers.core import Dense, Dropout, Flatten
 from keras.optimizers import RMSprop
 from keras.layers.convolutional import Conv2D
-from keras.callbacks import ModelCheckpoint
-from keras.layers import Embedding, TimeDistributed, RepeatVector, LSTM, concatenate , Input, Reshape, Dense
-from keras.preprocessing.image import array_to_img, img_to_array, load_img
+# from keras.callbacks import ModelCheckpoint
+from keras.layers import Embedding, RepeatVector, LSTM, concatenate, Input
 import numpy as np
+from keras.callbacks import TensorBoard
 
 dir_name = 'resources/eval_light/'
 
 # Read a file and return a string
+
+
 def load_doc(filename):
+    print(filename)
     file = open(filename, 'r')
     text = file.read()
     file.close()
     return text
+
 
 def load_data(data_dir):
     text = []
@@ -30,11 +33,11 @@ def load_data(data_dir):
     for filename in (all_filenames):
         if filename[-3:] == "npz":
             # Load the images already prepared in arrays
-            image = np.load(data_dir+filename)
+            image = np.load(data_dir + filename)
             images.append(image['features'])
-        else:
+        elif filename[0] != ".":
             # Load the boostrap tokens and rap them in a start and end tag
-            syntax = '<START> ' + load_doc(data_dir+filename) + ' <END>'
+            syntax = '<START> ' + load_doc(data_dir + filename) + ' <END>'
             # Seperate all the words with a single space
             syntax = ' '.join(syntax.split())
             # Add a space after each comma
@@ -43,14 +46,15 @@ def load_data(data_dir):
     images = np.array(images, dtype=float)
     return images, text
 
+
 train_features, texts = load_data(dir_name)
 
-# Initialize the function to create the vocabulary 
+# Initialize the function to create the vocabulary
 tokenizer = Tokenizer(filters='', split=" ", lower=False)
-# Create the vocabulary 
+# Create the vocabulary
 tokenizer.fit_on_texts([load_doc('resources/bootstrap.vocab')])
 
-# Add one spot for the empty word in the vocabulary 
+# Add one spot for the empty word in the vocabulary
 vocab_size = len(tokenizer.word_index) + 1
 # Map the input sentences into the vocabulary indexes
 train_sequences = tokenizer.texts_to_sequences(texts)
@@ -58,6 +62,7 @@ train_sequences = tokenizer.texts_to_sequences(texts)
 max_sequence = max(len(s) for s in train_sequences)
 # Specify how many tokens to have in each input sentence
 max_length = 48
+
 
 def preprocess_data(sequences, features):
     X, y, image_data = list(), list(), list()
@@ -76,17 +81,18 @@ def preprocess_data(sequences, features):
             y.append(out_seq)
     return np.array(X), np.array(y), np.array(image_data)
 
+
 X, y, image_data = preprocess_data(train_sequences, train_features)
 
-#Create the encoder
+# Create the encoder
 image_model = Sequential()
 image_model.add(Conv2D(16, (3, 3), padding='valid', activation='relu', input_shape=(256, 256, 3,)))
-image_model.add(Conv2D(16, (3,3), activation='relu', padding='same', strides=2))
-image_model.add(Conv2D(32, (3,3), activation='relu', padding='same'))
-image_model.add(Conv2D(32, (3,3), activation='relu', padding='same', strides=2))
-image_model.add(Conv2D(64, (3,3), activation='relu', padding='same'))
-image_model.add(Conv2D(64, (3,3), activation='relu', padding='same', strides=2))
-image_model.add(Conv2D(128, (3,3), activation='relu', padding='same'))
+image_model.add(Conv2D(16, (3, 3), activation='relu', padding='same', strides=2))
+image_model.add(Conv2D(32, (3, 3), activation='relu', padding='same'))
+image_model.add(Conv2D(32, (3, 3), activation='relu', padding='same', strides=2))
+image_model.add(Conv2D(64, (3, 3), activation='relu', padding='same'))
+image_model.add(Conv2D(64, (3, 3), activation='relu', padding='same', strides=2))
+image_model.add(Conv2D(128, (3, 3), activation='relu', padding='same'))
 
 image_model.add(Flatten())
 image_model.add(Dense(1024, activation='relu'))
@@ -104,7 +110,7 @@ language_model = Embedding(vocab_size, 50, input_length=max_length, mask_zero=Tr
 language_model = LSTM(128, return_sequences=True)(language_model)
 language_model = LSTM(128, return_sequences=True)(language_model)
 
-#Create the decoder
+# Create the decoder
 decoder = concatenate([encoded_image, language_model])
 decoder = LSTM(512, return_sequences=True)(decoder)
 decoder = LSTM(512, return_sequences=False)(decoder)
@@ -115,8 +121,13 @@ model = Model(inputs=[visual_input, language_input], outputs=decoder)
 optimizer = RMSprop(lr=0.0001, clipvalue=1.0)
 model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 
-filepath="org-weights-epoch-{epoch:04d}--val_loss-{val_loss:.4f}--loss-{loss:.4f}.hdf5"
-checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_weights_only=True, period=2)
-callbacks_list = [checkpoint]
+# filepath = "org-weights-epoch-{epoch:04d}--val_loss-{val_loss:.4f}--loss-{loss:.4f}.hdf5"
+# checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_weights_only=True, period=2)
+callbacks_list = [TensorBoard(log_dir='logs', write_images=1, histogram_freq=1)]
 
 model.fit([image_data, X], y, batch_size=1, shuffle=False, validation_split=0.1, callbacks=callbacks_list, verbose=1, epochs=50)
+version = '001'
+with open('model%d.json' % version, 'w') as w:
+    w.write(model.to_json())
+print('save weight')
+model.save_weights('weight%d.h5' % version)
