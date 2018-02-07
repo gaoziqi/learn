@@ -1,7 +1,12 @@
+from rules import rules, rlen
+
+const_str = '34567890JQKA2wW'
+
+
 class Poker:
 
     def __init__(self, pok=None):
-        self.pok = pok if pok else [0] * 15 # 0x 1~13 14d
+        self.pok = pok if pok else [0] * 15  # 34567890JQKA2wW
 
     def clone(self):
         return Poker(pok=[i for i in self.pok])
@@ -12,34 +17,17 @@ class Poker:
     def __eq__(self, other):
         return self.pok == other.pok
 
-    def _islegal(self):
-        l, pok = len(self.pok), self.pok
-        if l < 2:
-            return True
-        elif l == 2:
-            if pok[0] == 1 and pok[14] == 1:
-                return True
-            for i in range(1, 14):
-                if pok[i] == 2:
-                    return True
-            return False
-        elif l == 3:
-            for i in range(1, 14):
-                if pok[i] == 3:
-                    return True
-            return False
-        elif l == 4:
-            for i in range(1, 14):
-                if pok[i] == 4 or pok[i] == 3:
-                    return True
-            return False
-        elif l == 5:
-            if pok[0] + pok[14] != 0:
-                return False
-            for i in range(1, 14):
-                if pok[i] == 3:
-                    return True
-            return False
+    def __str__(self):
+        return ''.join([const_str[i] * j for i, j in enumerate(self.pok)])
+
+    def value(self):
+        s = self.__str__()
+        l = len(s)
+        if l in rlen:
+            for j in rlen[l]:
+                if s in rules[j]:
+                    return [j, rules[j].index(s)]
+        return [None, None]
 
     def islegal(self, other):
         pass
