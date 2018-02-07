@@ -7,10 +7,12 @@ import os
 import time
 import getopt
 import sys
-import pexpect
+try:
+    import pexpect
+except ImportError:
+    pass
 
 SSH_NEWKEY = r'Are you sure you want to continue connecting \(yes/no\)\?'
-
 
 def auto_run(cmd, passwd='tdq$abc123'):
     os.system(cmd)
