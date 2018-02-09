@@ -1,7 +1,4 @@
-from rules import rules, rlen
-
-const_str = '34567890JQKA2wW'
-
+from rules import rules, rlen, const_str
 
 class Poker:
 
