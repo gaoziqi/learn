@@ -14,6 +14,7 @@ class Tree:
         self.node = {}
         self.end = None
 
+
 root = Tree()
 
 for i in rules:
@@ -24,4 +25,3 @@ for i in rules:
                 ptr.node[j] = Tree()
             ptr = ptr.node[j]
         ptr.end = data
-
