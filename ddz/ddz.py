@@ -1,33 +1,4 @@
-from rules import rules, rlen, const_str
-
-class Poker:
-
-    def __init__(self, pok=None):
-        self.pok = pok if pok else [0] * 15  # 34567890JQKA2wW
-
-    def clone(self):
-        return Poker(pok=[i for i in self.pok])
-
-    def isempty(self):
-        return sum(self.pok) == 0
-
-    def __eq__(self, other):
-        return self.pok == other.pok
-
-    def __str__(self):
-        return ''.join([const_str[i] * j for i, j in enumerate(self.pok)])
-
-    def value(self):
-        s = self.__str__()
-        l = len(s)
-        if l in rlen:
-            for j in rlen[l]:
-                if s in rules[j]:
-                    return [j, rules[j].index(s)]
-        return [None, None]
-
-    def islegal(self, other):
-        pass
+from poker import Poker
 
 
 class Player:
