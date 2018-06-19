@@ -6,7 +6,7 @@ with open('../workday.txt', 'r') as r:
     username, password = r.readline().split(',')
 
 chrome = webdriver.Chrome()
-chrome.get('https://free.aliyun.com/ntms/free/experience/getTrial.html')
+chrome.get('https://account.aliyun.com/login/login.htm')
 chrome.find_element_by_xpath('/html/body/div[5]/div[2]/div/div[3]/a[1]').click()
 """time.sleep(1)
 chrome.switch_to.frame(chrome.find_element_by_id('alibaba-login-box'))
