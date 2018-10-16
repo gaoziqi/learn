@@ -1,0 +1,8 @@
+#冲突时才不合并
+prop.conf merge=ours 
+#git merge --no-ff
+#git config diff.nodiff.command true
+pom.conf diff=nodiff
+#统一linux换行符
+*.py text eol=lf
+*.conf text eol=lf
