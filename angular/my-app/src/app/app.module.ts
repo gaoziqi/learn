@@ -8,6 +8,7 @@ import { MatTableModule, MatPaginatorModule, MatSortModule, MatGridListModule, M
 import { MdComponent } from './md/md.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { MnComponent } from './mn/mn.component';
+import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { MnComponent } from './mn/mn.component';
     LayoutModule,
     MatToolbarModule,
     MatSidenavModule,
-    MatListModule
+    MatListModule,
+    AppRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]
