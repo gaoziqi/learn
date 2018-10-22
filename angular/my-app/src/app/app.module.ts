@@ -22,7 +22,7 @@ import { LayoutModule } from '@angular/cdk/layout';
 import { AppRoutingModule } from './app-routing.module';
 import { PanelComponent } from './panel/panel.component';
 import { PanelChildComponent } from './panel-child/panel-child.component';
-import { NgDragDropModule } from 'ng-drag-drop';
+import { NgDragDropModule } from '../../third/ng-drag-drop/ng-drag-drop.module';
 
 @NgModule({
   declarations: [AppComponent, MtComponent, MdComponent, PanelComponent, PanelChildComponent],
