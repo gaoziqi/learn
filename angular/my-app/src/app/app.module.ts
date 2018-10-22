@@ -20,9 +20,12 @@ import {
 import { MdComponent } from './md/md.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { AppRoutingModule } from './app-routing.module';
+import { PanelComponent } from './panel/panel.component';
+import { PanelChildComponent } from './panel-child/panel-child.component';
+import { NgDragDropModule } from 'ng-drag-drop';
 
 @NgModule({
-  declarations: [AppComponent, MtComponent, MdComponent],
+  declarations: [AppComponent, MtComponent, MdComponent, PanelComponent, PanelChildComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -38,7 +41,8 @@ import { AppRoutingModule } from './app-routing.module';
     MatToolbarModule,
     MatSidenavModule,
     MatListModule,
-    AppRoutingModule
+    AppRoutingModule,
+    NgDragDropModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]
