@@ -13,6 +13,8 @@ import {
 } from '@angular/core';
 import { NgDragDropService } from '../services/ng-drag-drop.service';
 import { DomHelper } from '../shared/dom-helper';
+import { Subscription } from 'rxjs';
+import { DropEvent } from '../shared/drop-event.model';
 
 @Directive({
   selector: '[draggable]'
@@ -112,6 +114,12 @@ export class Draggable implements OnInit, OnDestroy {
   onDragEnd: EventEmitter<any> = new EventEmitter();
 
   /**
+   * Event fired when an element is dropped on a valid drop target.
+   */
+  @Output()
+  onDragDrop: EventEmitter<any> = new EventEmitter();
+
+  /**
    * @private
    * Keeps track of mouse over element that is used to determine drag handles
    */
@@ -137,9 +145,20 @@ export class Draggable implements OnInit, OnDestroy {
 
   /**
    * @private
+   */
+  dropSubscription: Subscription;
+
+  /**
+   * @private
    * Function for unbinding the drag listener
    */
   unbindDragListener: Function;
+
+  /**
+   * @private
+   * Backing field for the dragEnabled property
+   */
+  _remove = false;
 
   constructor(
     protected el: ElementRef,
@@ -153,6 +172,7 @@ export class Draggable implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.unsubscribeService();
     this.unbindDragListeners();
   }
 
@@ -181,6 +201,7 @@ export class Draggable implements OnInit, OnDestroy {
       }
 
       e.stopPropagation();
+      this._remove = true;
       this.onDragStart.emit(e);
       this.ng2DragDropService.onDragStart.next();
 
@@ -204,6 +225,7 @@ export class Draggable implements OnInit, OnDestroy {
     DomHelper.removeClass(this.el, this.dragClass);
     this.ng2DragDropService.onDragEnd.next();
     this.onDragEnd.emit(e);
+    this._remove = false;
     e.stopPropagation();
     e.preventDefault();
   }
@@ -231,6 +253,11 @@ export class Draggable implements OnInit, OnDestroy {
 
     if (this.dragEnabled) {
       DomHelper.addClass(dragElement, this.dragHandleClass);
+      this.dropSubscription = this.ng2DragDropService.onDrop.subscribe(() => {
+        if (this._remove) {
+          this.onDragDrop.emit(this.ng2DragDropService.dragData);
+        }
+      });
     } else {
       DomHelper.removeClass(this.el, this.dragHandleClass);
     }
@@ -243,6 +270,12 @@ export class Draggable implements OnInit, OnDestroy {
     }
 
     return dragElement;
+  }
+
+  unsubscribeService() {
+    if (this.dropSubscription) {
+      this.dropSubscription.unsubscribe();
+    }
   }
 
   unbindDragListeners() {

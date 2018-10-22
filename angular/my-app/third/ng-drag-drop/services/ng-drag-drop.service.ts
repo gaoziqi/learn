@@ -11,6 +11,6 @@ export class NgDragDropService {
   scope: string | Array<string>;
   onDragStart = new Subject<any>();
   onDragEnd = new Subject<any>();
-
+  onDrop = new Subject<any>();
   constructor() {}
 }

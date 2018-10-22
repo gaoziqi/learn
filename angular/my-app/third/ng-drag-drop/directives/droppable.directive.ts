@@ -179,6 +179,7 @@ export class Droppable implements OnInit, OnDestroy {
 
         this.ng2DragDropService.onDragEnd.next();
         this.onDrop.emit(new DropEvent(e, this.ng2DragDropService.dragData));
+        this.ng2DragDropService.onDrop.next();
         this.ng2DragDropService.dragData = null;
         this.ng2DragDropService.scope = null;
       }
@@ -225,7 +226,6 @@ export class Droppable implements OnInit, OnDestroy {
       this.allowDrop().subscribe(result => {
         if (result && this._isDragActive) {
           DomHelper.addClass(this.el, this.dragHintClass);
-
           this.zone.runOutsideAngular(() => {
             this.unbindDragEnterListener = this.renderer.listen(this.el.nativeElement, 'dragenter', dragEvent => {
               this.dragEnter(dragEvent);

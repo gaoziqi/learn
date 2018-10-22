@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import * as _ from 'lodash';
 import { DropEvent } from '../../../third/ng-drag-drop/shared/drop-event.model';
 
 @Component({
@@ -12,8 +11,13 @@ export class PanelChildComponent implements OnInit {
   start = null;
   onItemDrop(e: DropEvent) {
     // Get the dropped data here
-    console.log(this.items);
+    console.log(1);
     this.items.push(e.dragData);
+  }
+
+  onDragDrop(e: any) {
+    this.items.splice(this.items.indexOf(e), 1);
+    console.log(this.items);
   }
 
   ngOnInit() {}
