@@ -3,7 +3,10 @@ import { DropEvent } from '../../../third/ng-drag-drop/shared/drop-event.model';
 
 @Component({
   selector: 'app-panel-child',
-  templateUrl: './panel-child.component.html'
+  templateUrl: './panel-child.component.html',
+  styles: [`.list-group{
+    min-height: 50px;
+  }`]
 })
 export class PanelChildComponent implements OnInit {
   constructor() {}
@@ -11,13 +14,11 @@ export class PanelChildComponent implements OnInit {
   start = null;
   onItemDrop(e: DropEvent) {
     // Get the dropped data here
-    console.log(1);
     this.items.push(e.dragData);
   }
 
   onDragDrop(e: any) {
     this.items.splice(this.items.indexOf(e), 1);
-    console.log(this.items);
   }
 
   ngOnInit() {}

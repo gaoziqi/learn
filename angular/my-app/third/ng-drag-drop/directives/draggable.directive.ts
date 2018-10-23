@@ -14,7 +14,6 @@ import {
 import { NgDragDropService } from '../services/ng-drag-drop.service';
 import { DomHelper } from '../shared/dom-helper';
 import { Subscription } from 'rxjs';
-import { DropEvent } from '../shared/drop-event.model';
 
 @Directive({
   selector: '[draggable]'
@@ -222,7 +221,9 @@ export class Draggable implements OnInit, OnDestroy {
   @HostListener('dragend', ['$event'])
   dragEnd(e) {
     this.unbindDragListeners();
-    DomHelper.removeClass(this.el, this.dragClass);
+    setTimeout(() => {
+      DomHelper.removeClass(this.el, this.dragClass);
+    }, 15);
     this.ng2DragDropService.onDragEnd.next();
     this.onDragEnd.emit(e);
     this._remove = false;
