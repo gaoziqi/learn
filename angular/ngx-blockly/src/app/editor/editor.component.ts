@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output } from '@angular/core';
 // import js
 declare var Blockly: any;
 
@@ -8,10 +8,15 @@ declare var Blockly: any;
   styleUrls: ['./editor.component.css']
 })
 export class EditorComponent implements OnInit {
+  private blocklyArea: HTMLElement;
+  private blocklyDiv: HTMLElement;
+  private workspace: HTMLElement;
   constructor() {}
 
   ngOnInit() {
-    const workspace = Blockly.inject('blocklyDiv', {
+    this.blocklyArea = document.getElementById('blocklyArea');
+    this.blocklyDiv = document.getElementById('blocklyDiv');
+    this.workspace = Blockly.inject('blocklyDiv', {
       toolbox: `
     <xml id="toolbox" style="display: none">
       <category name="{catLogic}" colour="210">
@@ -310,5 +315,27 @@ export class EditorComponent implements OnInit {
       <category name="{catFunctions}" colour="290" custom="PROCEDURE"></category>
     </xml>`
     });
+
+    window.addEventListener('resize', this.onresize, false);
+    this.onresize();
+    Blockly.svgResize(this.workspace);
+  }
+
+  onresize() {
+    // Compute the absolute coordinates and dimensions of blocklyArea.
+    let element = this.blocklyArea;
+    let x = 0;
+    let y = 0;
+    do {
+      x += element.offsetLeft;
+      y += element.offsetTop;
+      element = <HTMLElement>element.offsetParent;
+    } while (element);
+    // Position blocklyDiv over blocklyArea.
+    this.blocklyDiv.style.left = x + 'px';
+    this.blocklyDiv.style.top = y + 'px';
+    this.blocklyDiv.style.width = this.blocklyArea.offsetWidth + 'px';
+    this.blocklyDiv.style.height = this.blocklyArea.offsetHeight + 'px';
+    Blockly.svgResize(this.workspace);
   }
 }
